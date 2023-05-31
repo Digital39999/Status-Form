@@ -37,7 +37,7 @@ export default function CustomModal({ data }: APIResponse) {
 	}, [data?.modal]);
 
 	useEffect(() => {
-		setIsDisabled(!data?.modal || isSubmitting || !!message.type || data?.modal.some((input) => {
+		setIsDisabled(!data?.modal || data.isRoot || isSubmitting || !!message.type || data?.modal.some((input) => {
 			if (input.required && !formData?.find((data) => data.name === input.custom_id)?.value) return true;
 			if (input.min_length && (formData?.find((data) => data.name === input.custom_id)?.value.length || 0) < input.min_length) return true;
 			if (input.max_length && (formData?.find((data) => data.name === input.custom_id)?.value.length || 0) > input.max_length) return true;
