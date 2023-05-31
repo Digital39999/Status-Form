@@ -149,7 +149,7 @@ export default function CustomModal({ data }: APIResponse) {
 
 				<HStack bg='#2f3136' spacing={2} w='100%' py={3.5} px={4} justifyContent={'flex-end'} borderBottomRadius={'lg'}>
 					<Button variant={'ghost'} rounded={'5px'} _hover={{ bg: '#1d1f23', color: 'white' }} onClickCapture={() => { window.location.href = data?.support || 'https://discord.gg/4rphpersCa'; }}>Contact Support</Button>
-					<Button bg='#5865f2' rounded={'5px'} _hover={{ bg: '#5865f2' }} type='submit' isLoading={isSubmitting} isDisabled={isDisabled}>{isDisabled && message.type === 'success' ? 'Submitted' : message.type === 'error' ? 'Error' : message.type === 'warn' ? 'Not Allowed' : 'Submit'}</Button>
+					<Button bg='#5865f2' rounded={'5px'} _hover={{ bg: '#5865f2' }} type='submit' isLoading={isSubmitting} isDisabled={data?.isRoot || isDisabled}>{isDisabled && message.type === 'success' ? 'Submitted' : message.type === 'error' ? 'Error' : message.type === 'warn' ? 'Not Allowed' : 'Submit'}</Button>
 				</HStack>
 			</chakra.form>
 		</VStack>
