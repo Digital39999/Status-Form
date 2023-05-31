@@ -14,6 +14,8 @@ export default Home;
 
 export type APIResponse = {
 	data: {
+		isRoot: boolean;
+
 		modal: Modal[];
 		title: string;
 		icon?: string;
@@ -30,19 +32,26 @@ async function fetchInputs(options: { key: string; url: string; dev: boolean; })
 	const data = await fetch(options.url || `http://${options.dev ? 'localhost:3003' : 'api.statusbot.us'}/data/form/${options.key}`).catch(() => null);
 	if (!data) return { data: null };
 
-	const json = await data.json() as APIResponse;
-	if (!json?.data) return { data: null };
+	try {
+		const json = await data.json() as APIResponse;
+		if (!json?.data) return { data: null };
 
-	return {
-		data: {
-			...json.data,
-			isDev: options.dev,
-			key: options.key,
-		},
-	};
+		return {
+			data: {
+				...json.data,
+				isDev: options.dev,
+				key: options.key,
+			},
+		};
+	} catch {
+		return { data: null };
+	}
 }
 
 Home.getInitialProps = async (context: NextPageContext) => {
+	const isRoot = context.asPath === '/';
+	if (isRoot) return { data: { isRoot: true, modal: [] } };
+
 	const { query } = context;
 	const { key, url, dev } = query;
 	if (!key) return { data: null };

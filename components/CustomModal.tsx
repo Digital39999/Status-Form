@@ -32,11 +32,12 @@ export default function CustomModal({ data }: APIResponse) {
 	})));
 
 	useEffect(() => {
-		if (!data?.modal?.length) setMessage({ type: 'error', message: 'There was an error fetching the form.' });
+		if (!data?.modal?.length && data?.isRoot) setMessage({ type: 'warn' });
+		else if (!data?.modal?.length) setMessage({ type: 'error', message: 'There was an error fetching the form.' });
 	}, [data?.modal]);
 
 	useEffect(() => {
-		setIsDisabled(!data?.modal || isSubmitting || message.type === 'success' || data?.modal.some((input) => {
+		setIsDisabled(!data?.modal || isSubmitting || !!message.type || data?.modal.some((input) => {
 			if (input.required && !formData?.find((data) => data.name === input.custom_id)?.value) return true;
 			if (input.min_length && (formData?.find((data) => data.name === input.custom_id)?.value.length || 0) < input.min_length) return true;
 			if (input.max_length && (formData?.find((data) => data.name === input.custom_id)?.value.length || 0) > input.max_length) return true;
@@ -76,9 +77,9 @@ export default function CustomModal({ data }: APIResponse) {
 				<VStack p={4} align={'start'} w='100%'>
 
 					<HStack pb={3} fontSize='lg'>
-						<ChakraImage alt='icon' src={data?.icon || 'https://cdn.crni.xyz/r/logo.gif'} width={8} height={8} rounded={'full'} />
+						<ChakraImage alt='icon' src={data?.icon || 'https://cdn.crni.xyz/r/status.png'} width={8} height={8} rounded={'full'} />
 						<Heading fontSize={'xl'} fontFamily={'body'}>
-							{data?.title || 'Digital Form'}
+							{data?.title || 'Status Bot Form'}
 						</Heading>
 					</HStack>
 					<VStack align={'start'} w='100%' spacing={3}>
@@ -148,7 +149,7 @@ export default function CustomModal({ data }: APIResponse) {
 
 				<HStack bg='#2f3136' spacing={2} w='100%' py={3.5} px={4} justifyContent={'flex-end'} borderBottomRadius={'lg'}>
 					<Button variant={'ghost'} rounded={'5px'} _hover={{ bg: '#1d1f23', color: 'white' }} onClickCapture={() => { window.location.href = data?.support || 'https://discord.gg/4rphpersCa'; }}>Contact Support</Button>
-					<Button bg='#5865f2' rounded={'5px'} _hover={{ bg: '#5865f2' }} type='submit' isLoading={isSubmitting} isDisabled={isDisabled}>{isDisabled && message.type === 'success' ? 'Submitted' : message.type === 'error' ? 'Error' : 'Submit'}</Button>
+					<Button bg='#5865f2' rounded={'5px'} _hover={{ bg: '#5865f2' }} type='submit' isLoading={isSubmitting} isDisabled={isDisabled}>{isDisabled && message.type === 'success' ? 'Submitted' : message.type === 'error' ? 'Error' : message.type === 'warn' ? 'Not Allowed' : 'Submit'}</Button>
 				</HStack>
 			</chakra.form>
 		</VStack>

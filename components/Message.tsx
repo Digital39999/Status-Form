@@ -15,7 +15,7 @@ export default function Message(message: MessageCheck) {
 			<Icon as={message.type === 'error' ? CloseIcon : message.type === 'success' ? CheckIcon : WarningIcon}
 				color={(message.type === 'error' ? '#f17f7e' : message.type === 'success' ? '#7bcba7' : '#f5d76e')} boxSize={4} />
 			<Text>
-				{message.message || (message.type === 'error' ? 'There was an error submitting this form.' : message.type === 'success' ? 'Your form has been submitted successfully.' : 'This is a warning message.')}
+				{message.message || (message.type === 'error' ? 'There was an error submitting this form.' : message.type === 'success' ? 'Your form has been submitted successfully.' : 'You are not allowed to use this form.')}
 			</Text>
 		</HStack>
 	);
