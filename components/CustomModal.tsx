@@ -39,8 +39,8 @@ export default function CustomModal({ data }: APIResponse) {
 	useEffect(() => {
 		setIsDisabled(!data?.modal || data.isRoot || isSubmitting || !!message.type || data?.modal.some((input) => {
 			if (input.required && !formData?.find((data) => data.name === input.custom_id)?.value) return true;
-			if (input.min_length && (formData?.find((data) => data.name === input.custom_id)?.value.length || 0) < input.min_length) return true;
-			if (input.max_length && (formData?.find((data) => data.name === input.custom_id)?.value.length || 0) > input.max_length) return true;
+			if (input.min_length && input.required && (formData?.find((data) => data.name === input.custom_id)?.value.length || 0) < input.min_length) return true;
+			if (input.max_length && input.required && (formData?.find((data) => data.name === input.custom_id)?.value.length || 0) > input.max_length) return true;
 		}));
 	}, [formData, isSubmitting]);
 
@@ -48,7 +48,15 @@ export default function CustomModal({ data }: APIResponse) {
 		event.preventDefault();
 		setIsSubmitting(true);
 
-		const response = await fetch(data?.callback || `https://${data?.isDev ? 'status-local.crni.xyz' : 'api.statusbot.us'}/data/form/${data?.key}`, {
+		if (data?.key === 'demo') return setTimeout(() => {
+			setIsDisabled(true);
+			setIsSubmitting(false);
+
+			setMessage({ type: 'success' });
+			if (data?.modal.length) data.modal.length = 0;
+		}, 2000);
+
+		const response = await fetch(`https://${data?.isDev ? 'status-local.crni.xyz' : 'api.statusbot.us'}/data/form/${data?.key}`, {
 			method: 'POST',
 			body: JSON.stringify({
 				form: formData,
@@ -72,7 +80,7 @@ export default function CustomModal({ data }: APIResponse) {
 	};
 
 	return (
-		<VStack bg='#36393f' color='white' rounded={'lg'} align={'start'} maxW={'440px'} w='100%' fontWeight={500}>
+		<VStack bg='#36393f' color='white' rounded={'lg'} align={'start'} maxW={'440px'} w='100%' fontWeight={500} m={4}>
 			<chakra.form onSubmit={async (e) => await submit(e)} w='100%' display={'flex'} gap={2} flexDir={'column'}>
 				<VStack p={4} align={'start'} w='100%'>
 
@@ -85,7 +93,14 @@ export default function CustomModal({ data }: APIResponse) {
 					<VStack align={'start'} w='100%' spacing={3}>
 						{message.type && Message(message)}
 
-						{data?.modal?.map((m, i) => (
+						{data?.modal?.map((m) => {
+							if (!m.max_length) {
+								if (m.style === 1) m.max_length = 256;
+								else m.max_length = 2048;
+							}
+
+							return m;
+						})?.map((m, i) => (
 							<VStack w='100%' spacing={1} align={'start'} key={i}>
 								<Text fontSize={'sm'} textTransform={'uppercase'}>
 									<Box as='span' opacity={.82}>{m.label}</Box>
@@ -126,18 +141,16 @@ export default function CustomModal({ data }: APIResponse) {
 
 								<Flex w='100%' justify='space-between'>
 									<Box>
-										{m.min_length && (formData?.find((data) => data.name === m.custom_id)?.value.length || 0) < m.min_length ? (
+										{m.min_length && m.required && (formData?.find((data) => data.name === m.custom_id)?.value.length || 0) < m.min_length ? (
 											<Text fontSize='x-small' color='#f17f7e' alignSelf='start'>Minimum length is {m.min_length}.</Text>
-										) : m.max_length && (formData?.find((data) => data.name === m.custom_id)?.value.length || 0) > m.max_length ? (
+										) : m.max_length && m.required && (formData?.find((data) => data.name === m.custom_id)?.value.length || 0) > m.max_length ? (
 											<Text fontSize='x-small' color='#f17f7e' alignSelf='start'>Maximum length is {m.max_length}.</Text>
 										) : null}
 									</Box>
 									<Box>
-										{m.min_length && m.max_length && (
-											<Text fontSize='x-small' fontWeight={400} opacity={0.7} alignSelf='end'>
-												{`${(formData?.find((data) => data.name === m.custom_id)?.value.length || 0)}/${m.max_length}`}
-											</Text>
-										)}
+										<Text fontSize='x-small' fontWeight={400} opacity={0.7} alignSelf='end'>
+											{`${(formData?.find((data) => data.name === m.custom_id)?.value.length || 0)}/${m.max_length}`}
+										</Text>
 									</Box>
 								</Flex>
 
@@ -148,7 +161,7 @@ export default function CustomModal({ data }: APIResponse) {
 				</VStack>
 
 				<HStack bg='#2f3136' spacing={2} w='100%' py={3.5} px={4} justifyContent={'flex-end'} borderBottomRadius={'lg'}>
-					<Button variant={'ghost'} rounded={'5px'} _hover={{ bg: '#1d1f23', color: 'white' }} onClickCapture={() => { window.location.href = data?.support || 'https://discord.gg/4rphpersCa'; }}>Contact Support</Button>
+					<Button variant={'ghost'} rounded={'5px'} _hover={{ bg: '#1d1f23', color: 'white' }} onClickCapture={() => { window.location.href = 'https://discord.gg/4rphpersCa'; }}>Contact Support</Button>
 					<Button bg='#5865f2' rounded={'5px'} _hover={{ bg: '#5865f2' }} type='submit' isLoading={isSubmitting} isDisabled={data?.isRoot || isDisabled}>{isDisabled && message.type === 'success' ? 'Submitted' : message.type === 'error' ? 'Error' : message.type === 'warn' ? 'Not Allowed' : 'Submit'}</Button>
 				</HStack>
 			</chakra.form>

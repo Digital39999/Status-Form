@@ -14,17 +14,15 @@ export default Home;
 
 export type APIResponse = {
 	data: {
-		isRoot: boolean;
+		key: string;
+
+		isRoot?: boolean;
+		isDemo?: boolean;
+		isDev?: boolean;
 
 		modal: Modal[];
 		title: string;
 		icon?: string;
-
-		support?: string;
-		callback?: string;
-
-		isDev?: boolean;
-		key: string;
 	} | null;
 };
 

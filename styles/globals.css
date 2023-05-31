@@ -11,6 +11,7 @@ html {
     overflow-x: hidden;
     margin: 0rem;
     background-image: url('https://cdn.crni.xyz/r/bg_dark.png');
+    background-color: #1d1f23;
     zoom: 1.0;
     user-select: none;
     overflow: disabled;
